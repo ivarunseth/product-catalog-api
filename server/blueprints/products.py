@@ -37,6 +37,12 @@ def product_search():
     except ValueError:
         limit = 12
 
+    cache_key = f"search:q={q}:cat={category_id}:brand={brand_id}:page={page}:limit={limit}"
+
+    cached_response = current_app.cache.get(cache_key)
+    if cached_response:
+        return jsonify(cached_response)
+
     query = Product.query
     if q:
         query = query.filter(Product.title.ilike(f"%{q}%"))
@@ -47,41 +53,39 @@ def product_search():
 
     total = query.count()
     items = query.offset((page - 1) * limit).limit(limit).all()
-
-    # Images are already returned as base64 data URIs
     data = [p.to_dict(include_images=True) for p in items]
 
-    filters_key = f"filters:q={q}:cat={category_id}:brand={brand_id}"
-    cached_filters = current_app.cache.get(filters_key)
+    category_ids = set()
+    brand_ids = set()
 
-    if not cached_filters:
-        category_ids = set()
-        brand_ids = set()
+    for p in query.limit(500).all():
+        if p.brand_id:
+            brand_ids.add(p.brand_id)
+        for c in p.categories:
+            category_ids.add(c.id)
 
-        # Limit filter computation to first 500 products
-        for p in query.limit(500).all():
-            if p.brand_id:
-                brand_ids.add(p.brand_id)
-            for c in p.categories:
-                category_ids.add(c.id)
+    categories = [
+        {'id': c.id, 'name': c.name}
+        for c in Category.query.filter(Category.id.in_(list(category_ids))).all()
+    ] if category_ids else []
 
-        categories = [
-            {'id': c.id, 'name': c.name}
-            for c in Category.query.filter(Category.id.in_(list(category_ids))).all()
-        ] if category_ids else []
+    brands = [
+        {'id': b.id, 'name': b.name}
+        for b in Brand.query.filter(Brand.id.in_(list(brand_ids))).all()
+    ] if brand_ids else []
 
-        brands = [
-            {'id': b.id, 'name': b.name}
-            for b in Brand.query.filter(Brand.id.in_(list(brand_ids))).all()
-        ] if brand_ids else []
+    filters = {'categories': categories, 'brands': brands}
 
-        cached_filters = {'categories': categories, 'brands': brands}
-        current_app.cache.set(filters_key, cached_filters, ttl=60 * 60)
-
-    return jsonify({
+    # 4️⃣ Final payload
+    response_payload = {
         'total': total,
         'page': page,
         'limit': limit,
         'items': data,
-        'filters': cached_filters
-    })
+        'filters': filters
+    }
+
+    # 5️⃣ Cache full response for 1h
+    current_app.cache.set(cache_key, response_payload, ttl=60 * 60)
+
+    return jsonify(response_payload)
