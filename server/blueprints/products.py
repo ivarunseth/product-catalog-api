@@ -14,7 +14,7 @@ def product_detail(slug):
     if product.categories:
         breadcrumb = product.categories[0].breadcrumb()
 
-    payload = product.to_dict()  # Already returns Base64 images
+    payload = product.to_dict()
     payload['breadcrumb'] = breadcrumb
 
     current_app.cache.set(cache_key, payload, ttl=30 * 60)
@@ -76,7 +76,6 @@ def product_search():
 
     filters = {'categories': categories, 'brands': brands}
 
-    # 4️⃣ Final payload
     response_payload = {
         'total': total,
         'page': page,
@@ -85,7 +84,7 @@ def product_search():
         'filters': filters
     }
 
-    # 5️⃣ Cache full response for 1h
-    current_app.cache.set(cache_key, response_payload, ttl=60 * 60)
+    if total > 0 and data:
+        current_app.cache.set(cache_key, response_payload, ttl=current_app.config['CACHE_TTL'])
 
     return jsonify(response_payload)

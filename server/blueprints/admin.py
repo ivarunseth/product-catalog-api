@@ -16,7 +16,7 @@ def create_product():
         title=title,
         description=data.get('description', ''),
         price_cents=int(price * 100),
-        currency=data.get('currency', 'USD')
+        currency=data.get('currency', 'INR')
     )
 
     # Assign brand if provided
