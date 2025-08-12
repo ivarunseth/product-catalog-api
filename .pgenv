@@ -1,0 +1,4 @@
+POSTGRES_DB=catalog
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=pass123
+PGHOST=localhost:5432

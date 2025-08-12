@@ -1,0 +1,61 @@
+networks:
+  frontend:
+  backend:
+
+volumes:
+  data:
+  redis:
+
+services:
+  client:
+    image: varunseth2303/product-catalog-client:latest
+    container_name: product-catalog-client
+    build: 
+      context: .
+      dockerfile: docker/Dockerfile.client
+    ports:
+      - '3000:80'
+    depends_on:
+      - api
+    networks:
+      - frontend
+
+  api:
+    image: varunseth2303/product-catalog-api:latest
+    container_name: product-catalog-api
+    build:
+      context: .
+      dockerfile: docker/Dockerfile.api
+    env_file:
+      - .env
+    entrypoint: >
+      sh -c "flask db upgrade && gunicorn -b 0.0.0.0:5000 -w 1 --access-logfile - --log-level info app:app"
+    depends_on:
+      - db
+      - redis
+    networks:
+      - frontend
+      - backend
+  
+  db:
+    image: postgres:latest
+    container_name: product-catalog-db
+    env_file:
+      - .pgenv
+    ports:
+      - "5432:5432"
+    volumes:
+      - data:/var/lib/postgresql/data
+    networks:
+      - backend
+  
+  redis:
+    image: redis:latest
+    container_name: product-catalog-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis:/data
+    networks:
+      - backend
+      
