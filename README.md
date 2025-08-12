@@ -58,6 +58,9 @@ After that, you can run the application with the following command:
  
     python app.py
  
+You can seed data into the database by running:
+
+    python -m server.seed
  
 You can add `--help` to see what other start up options are available.
   
@@ -68,12 +71,23 @@ each service in separate containers after building client and api images.
  
     docker-compose up
  
+You can seed data into the database using docker by running:
+
+    docker exec product-catalog-api python -m server.seed
+
 you can add `--build` to build required images before starting.
  
 By default, docker refers to docker-compose.yml file to orchestrate container runtime environments.
 You can add `-f` to pass your YAML file to start the app.
  
  
+## Environment Variables
+
+You can create a .env file in your workspace to configure database and cache urls.
+
+- SQLALCHEMY_DATABASE_URI=<database-uri>
+- REDIS_URL=redis://
+
 ## Usage
 After running the application, it can be accessed via browser on http://localhost:3000.
  
