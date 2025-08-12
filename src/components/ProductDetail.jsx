@@ -35,7 +35,7 @@ export default function ProductDetail() {
         <div>
           <h1 className='text-2xl font-bold'>{p.title}</h1>
           <div className='text-2xl text-green-600 mt-2'>
-            ${(p.price || 0).toFixed(2)}
+            {p.currency}&nbsp;{(p.price || 0).toFixed(2)}
           </div>
           <div className='mt-4 text-gray-700'>{p.description}</div>
           <div className='mt-4 text-sm text-gray-600'>

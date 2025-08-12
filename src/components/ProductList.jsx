@@ -18,7 +18,7 @@ export default function ProductList() {
     return () => clearTimeout(handler)
   }, [q])
 
-  // Fetch products when filters or page change
+  // Fetch products
   useEffect(() => {
     const params = new URLSearchParams({
       q: debouncedQ,
@@ -32,7 +32,7 @@ export default function ProductList() {
       .then(data => {
         setItems(data.items || [])
         if (data.filters) {
-          setFilters(data.filters) // categories & brands from backend
+          setFilters(data.filters)
         }
       })
       .catch(err => console.error(err))
@@ -40,23 +40,24 @@ export default function ProductList() {
 
   return (
     <div>
-      {/* Search Bar */}
-      <div className="mb-6 flex justify-center">
-        <input
-          value={q}
-          onChange={e => setQ(e.target.value)}
-          placeholder="Search products..."
-          className="w-full max-w-lg p-3 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
+      {/* Top Bar with Search & Filters */}
+      <div className="flex flex-col md:flex-row items-center gap-4 mb-6 bg-white p-4 rounded-lg shadow-sm border border-gray-200">
+        
+        {/* Search Box */}
+        <div className="relative flex-1">
+          <input
+            value={q}
+            onChange={e => { setQ(e.target.value); setPage(1) }}
+            placeholder="🔍 Search products..."
+            className="w-full p-3 pr-10 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
 
-      {/* Filters */}
-      <div className="mb-6 flex flex-wrap gap-4 justify-center">
         {/* Category Filter */}
         <select
           value={categoryId}
           onChange={e => { setCategoryId(e.target.value); setPage(1) }}
-          className="p-2 border border-gray-300 rounded-lg"
+          className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         >
           <option value="">All Categories</option>
           {filters.categories.map(c => (
@@ -68,7 +69,7 @@ export default function ProductList() {
         <select
           value={brandId}
           onChange={e => { setBrandId(e.target.value); setPage(1) }}
-          className="p-2 border border-gray-300 rounded-lg"
+          className="p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500"
         >
           <option value="">All Brands</option>
           {filters.brands.map(b => (
@@ -83,20 +84,22 @@ export default function ProductList() {
       </div>
 
       {/* Pagination */}
-      <div className="mt-8 flex justify-center space-x-4">
-        <button
-          onClick={() => setPage(p => Math.max(1, p - 1))}
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-sm font-medium"
-        >
-          Prev
-        </button>
-        <button
-          onClick={() => setPage(p => p + 1)}
-          className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-sm font-medium"
-        >
-          Next
-        </button>
-      </div>
+      {items.length > 0 && (
+        <div className="mt-8 flex justify-center space-x-4">
+          <button
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-sm font-medium"
+          >
+            Prev
+          </button>
+          <button
+            onClick={() => setPage(p => p + 1)}
+            className="px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-md text-sm font-medium"
+          >
+            Next
+          </button>
+        </div>
+      )}
     </div>
   )
 }
