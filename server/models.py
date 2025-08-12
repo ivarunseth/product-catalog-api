@@ -49,7 +49,7 @@ class Product(db.Model):
     title = db.Column(db.String(256), nullable=False)
     description = db.Column(db.Text)
     price_cents = db.Column(db.Integer, nullable=False, default=0)
-    currency = db.Column(db.String(8), default='USD')
+    currency = db.Column(db.String(8), default='INR')
     slug = db.Column(db.String(300), unique=True, index=True)
     brand_id = db.Column(db.Integer, db.ForeignKey('brands.id'))
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
