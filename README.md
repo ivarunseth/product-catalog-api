@@ -89,5 +89,5 @@ You can create a .env file in your workspace to configure database and cache url
 - REDIS_URL=redis://
 
 ## Usage
-After running the application, it can be accessed via browser on http://localhost:3000.
+After running the application, it can be accessed via browser on http://localhost:5173.
  
