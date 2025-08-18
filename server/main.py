@@ -17,6 +17,5 @@ def index():
 
 @main.after_app_request
 def after_request(response):
-    
     current_app.logger.info('total time for request %s' % (time.time() - g.t))
     return response

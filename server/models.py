@@ -48,7 +48,7 @@ class Product(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(256), nullable=False)
     description = db.Column(db.Text)
-    price_cents = db.Column(db.Integer, nullable=False, default=0)
+    price = db.Column(db.Integer, nullable=False, default=0)
     currency = db.Column(db.String(8), default='INR')
     slug = db.Column(db.String(300), unique=True, index=True)
     brand_id = db.Column(db.Integer, db.ForeignKey('brands.id'))
@@ -83,7 +83,7 @@ class Product(db.Model):
             'id': self.id,
             'title': self.title,
             'description': self.description,
-            'price': (self.price_cents or 0) / 100.0,
+            'price': (self.price or 0) / 100.0,
             'currency': self.currency,
             'slug': self.slug,
             'brand': {'id': self.brand.id, 'name': self.brand.name} if (self.brand and include_brand) else None,
