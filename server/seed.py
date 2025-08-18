@@ -141,7 +141,7 @@ def seed():
             product = Product(
                 title=job["name"],
                 description=f"{job['name']}. {lorem.paragraph()}",
-                price_cents=int(job["price"] * 100),
+                price=int(job["price"] * 100),
                 currency="INR",
                 brand=brand
             )

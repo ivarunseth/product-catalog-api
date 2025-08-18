@@ -26,6 +26,7 @@ def product_search():
     q = request.args.get('q', '') or ''
     category_id = request.args.get('category_id')
     brand_id = request.args.get('brand_id')
+    sort_price = request.args.get('sort_price', None)
 
     try:
         page = int(request.args.get('page', 1))
@@ -37,7 +38,7 @@ def product_search():
     except ValueError:
         limit = 12
 
-    cache_key = f"search:q={q}:cat={category_id}:brand={brand_id}:page={page}:limit={limit}"
+    cache_key = f"search:q={q}:cat={category_id}:brand={brand_id}:page={page}:limit={limit}:sort_price={sort_price}"
 
     cached_response = current_app.cache.get(cache_key)
     if cached_response:
@@ -52,8 +53,17 @@ def product_search():
         query = query.join(Product.categories).filter(Category.id == int(category_id))
 
     total = query.count()
-    items = query.offset((page - 1) * limit).limit(limit).all()
-    data = [p.to_dict(include_images=True) for p in items]
+    items = query
+
+    if sort_price:
+        if sort_price == 'asc':
+            items = items.order_by(Product.price_cents.asc())
+        elif sort_price == 'desc':
+            items = items.order_by(Product.price_cents.desc())
+
+    items = items.offset((page - 1) * limit).limit(limit)
+
+    data = [p.to_dict(include_images=True) for p in items.all()]
 
     category_ids = set()
     brand_ids = set()

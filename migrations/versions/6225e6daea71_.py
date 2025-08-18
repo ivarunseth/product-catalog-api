@@ -35,7 +35,7 @@ def upgrade():
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('title', sa.String(length=256), nullable=False),
     sa.Column('description', sa.Text(), nullable=True),
-    sa.Column('price_cents', sa.Integer(), nullable=False),
+    sa.Column('price', sa.Integer(), nullable=False),
     sa.Column('currency', sa.String(length=8), nullable=True),
     sa.Column('slug', sa.String(length=300), nullable=True),
     sa.Column('brand_id', sa.Integer(), nullable=True),
